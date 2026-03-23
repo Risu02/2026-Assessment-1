@@ -1,12 +1,17 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
+import { NavContext } from "./App"
+
+let hasLoaded = false
 
 export default function Welcome() {
-    const [stage, setStage] = useState('connecting')
+    const [stage, setStage] = useState(() => hasLoaded ? 'ready' : 'connecting')
     const [connectText, setConnectText] = useState('')
     const [progress, setProgress] = useState(0)
     const [loaded, setLoaded] = useState(false)
     const [termText, setTermText] = useState('')
     const [staticFlash, setStaticFlash] = useState(false)
+
+    const { setNavLocked } = useContext(NavContext)
 
     const connectMsg = "CONNECTING TO FOUNDATION SERVER..."
     const fullText = "Welcome, █████. You have been granted Level ??? clearance to access the following classified SCP entries. Select a file from the navigation panel to begin your briefing."
@@ -16,6 +21,7 @@ export default function Welcome() {
 
     // Connecting message
     useEffect(() => {
+        if (hasLoaded) return
         let i = 0
         const interval = setInterval(() => {
             setConnectText(connectMsg.slice(0, i + 1))
@@ -33,7 +39,14 @@ export default function Welcome() {
         if (stage !== 'loading') return
         const interval = setInterval(() => {
             setProgress(p => {
-                if (p >= 100) { clearInterval(interval); setLoaded(true); setStage('ready'); return 100 }
+                if (p >= 100) {
+                    clearInterval(interval)
+                    setLoaded(true)
+                    setStage('ready')
+                    setNavLocked(false)
+                    hasLoaded = true
+                    return 100
+                }
                 return Math.min(p + Math.floor(Math.random() * 8) + 2, 100)
             })
         }, 80)
@@ -103,7 +116,6 @@ export default function Welcome() {
                     ⚠ UNAUTHORIZED ACCESS IS PUNISHABLE UNDER FOUNDATION PROTOCOL 12-B
                 </p>
             </div>
-
         </div>
     )
 }
