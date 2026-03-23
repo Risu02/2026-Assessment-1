@@ -1,11 +1,14 @@
 import { Link, useLocation } from "react-router-dom"
+import { useContext } from "react"
 import { scpdata } from "./scpdata"
+import { NavContext } from "./App"
 
 export default function NavMenu() {
     const location = useLocation()
+    const { navLocked } = useContext(NavContext)
 
     return (
-        <nav>
+        <nav style={navLocked ? { pointerEvents: 'none', opacity: 0.4 } : {}}>
             <div className="nav-header">
                 <img src="/image/scp-logo.png" alt="SCP Foundation" className="nav-logo" />
                 <div className="nav-title">
